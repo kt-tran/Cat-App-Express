@@ -8,12 +8,14 @@ router.get('/', function (req, res, next) {
   res.send('respond with a resource');
 });
 
-/* */
+/* POST create new user*/
 router.post('/register', function (req, res, next) {
   const email = req.body.email;
   const password = req.body.password;
   const username = req.body.username;
   let newUser = true;
+
+  console.log("asdjkdashk")
 
   //verify email & password in post body
   if (!email || !password) {
@@ -47,6 +49,7 @@ router.post('/register', function (req, res, next) {
     })
 })
 
+// POST login request
 router.post('/login', function (req, res, next) {
   const email = req.body.email;
   const password = req.body.password;
