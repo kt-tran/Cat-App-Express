@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
@@ -27,8 +28,7 @@ router.post('/register', function (req, res, next) {
   queryUsers
     .then((users) => {
       if (users.length > 0) {
-        console.log("User already exists");
-        newUser = false;
+        newUser = false; //user already exists
         return;
       }
 
@@ -53,7 +53,7 @@ router.post('/login', function (req, res, next) {
 
   //verify body
   if (!email || !password) {
-    res.status(400).jason({
+    res.status(400).json({
       error: true,
       message: "Request body incomplete - email and password needed"
     })
@@ -64,7 +64,7 @@ router.post('/login', function (req, res, next) {
   queryUsers
     .then((users) => {
       if (users.length === 0) {
-        console.log("User does not exist")
+        res.status(404).json({ success: false, messsage: "User not found" });
         return;
       }
 
@@ -74,11 +74,11 @@ router.post('/login', function (req, res, next) {
     })
     .then((match) => {
       if (!match) {
-        console.log("Passwords do not match");
+        res.status(401).json({ success: false, messsage: "Incorrect password" });
         return;
       }
 
-      // Create and retuen JWT token
+      // Create and return JWT token
       const secretKey = "secret key";
       const expires_in = 60 * 60 * 24; //1 Day
       const exp = Date.now() + expires_in * 1000;
