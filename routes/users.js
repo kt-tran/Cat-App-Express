@@ -67,17 +67,18 @@ router.post('/login', function (req, res, next) {
   queryUsers
     .then((users) => {
       if (users.length === 0) {
-        res.status(404).json({ success: false, messsage: "User not found" });
-        return;
+        res.status(404).json({ error: true, messsage: "User not found" });
+        return "a";
       }
 
       // Compare password hashes
       const user = users[0];
-      return bcrypt.compare(password, user.hash);
+      return bcrypt.compare(password, user.hash)
     })
     .then((match) => {
+      if (match === "a") return
       if (!match) {
-        res.status(401).json({ success: false, messsage: "Incorrect password" });
+        res.status(401).json({ error: true, messsage: "Incorrect password" });
         return;
       }
 
@@ -87,6 +88,8 @@ router.post('/login', function (req, res, next) {
       const token = jwt.sign({ email, exp }, secretKey);
       res.json({ token_type: "Bearer", token, expires_in })
     })
+
+
 })
 
 const authorise = (req, res, next) => {
@@ -125,7 +128,7 @@ router.get('/favlist', authorise, function (req, res) {
       res.json({
         "Error": false,
         "Message": "Success",
-        "list" : rows
+        "list": rows
       });
     })
     .catch(e => {
